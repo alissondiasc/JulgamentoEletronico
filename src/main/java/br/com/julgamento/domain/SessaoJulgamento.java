@@ -1,0 +1,31 @@
+package br.com.julgamento.domain;
+
+import br.com.julgamento.domain.enums.Indicador;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Date;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Document(collection = "SESSAO_JULGAMENTO")
+public class SessaoJulgamento  implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private String id;
+    @DBRef
+    private Pauta pauta;
+    private LocalDateTime dataInicio;
+    private LocalDateTime dataFim;
+    private Indicador indSessaoAberta;
+}
