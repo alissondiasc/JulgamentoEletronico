@@ -20,6 +20,7 @@ public class SessaoJulgamentoMapper implements AbstractMapper<SessaoJulgamento, 
     @Override
     public SessaoJulgamentoDTO entidadeParaDTO(SessaoJulgamento entidade) {
         return SessaoJulgamentoDTO.builder()
+                .id(entidade.getId())
                 .idPauta(entidade.getPauta().getId())
                 .dataInicio(entidade.getDataInicio())
                 .dataFim(entidade.getDataFim())

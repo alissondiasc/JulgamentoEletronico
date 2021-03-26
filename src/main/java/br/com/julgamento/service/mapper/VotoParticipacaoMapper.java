@@ -8,13 +8,21 @@ import br.com.julgamento.web.rest.dto.VotoParticipacaoDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 @AllArgsConstructor
 @Component
 public class VotoParticipacaoMapper  implements AbstractMapper<VotoParticipacao, VotoParticipacaoDTO> {
     @Override
     public VotoParticipacaoDTO entidadeParaDTO(VotoParticipacao entidade) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         return VotoParticipacaoDTO.builder()
                 .idAssociado(entidade.getAssociado().getId())
+                .nomeAssociado(entidade.getAssociado().getNome())
+                .votoParticipacao(entidade.getVoto())
+                .dataHoraSessaoJulgamento(entidade.getSessaoJulgamento().getDataInicio().format(formatter))
+                .pautaJulgada(entidade.getSessaoJulgamento().getPauta().getTema())
                 .idJulgamento(entidade.getSessaoJulgamento().getId())
                 .build();
     }

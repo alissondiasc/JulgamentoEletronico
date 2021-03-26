@@ -1,6 +1,7 @@
 package br.com.julgamento.web.rest.dto;
 
 import br.com.julgamento.util.annotations.UnicoCPF;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +15,8 @@ import javax.validation.constraints.NotEmpty;
 @Setter
 @Builder
 public class UsuarioDTO {
+    @ApiModelProperty(hidden = true)
+    private String id;
     @NotBlank(message = "O campo nome é de preenchimento obrigatório.")
     private String nome;
 

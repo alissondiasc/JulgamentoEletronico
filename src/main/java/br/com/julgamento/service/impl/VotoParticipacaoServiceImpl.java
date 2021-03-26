@@ -11,6 +11,9 @@ import br.com.julgamento.service.mapper.VotoParticipacaoMapper;
 import br.com.julgamento.web.rest.dto.VotoParticipacaoDTO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -41,17 +45,17 @@ public class VotoParticipacaoServiceImpl implements VotoParticipacaoService {
     }
 
     @Override
-    public ResultadoVotacao apurarVotosSessaoJulgamento(String idSessaoJulgamento ) {
+    public ResultadoVotacao apurarVotosSessaoJulgamento(String idSessaoJulgamento) {
         List<VotoParticipacao> votoParticipacaos = votoParticipacaoRepository.findBySessaoJulgamento(SessaoJulgamento.builder().id(idSessaoJulgamento).build());
-        if(!votoParticipacaos.isEmpty()){
+        if (!votoParticipacaos.isEmpty()) {
             long votosContra = votoParticipacaos.stream().filter(votoParticipacao -> !votoParticipacao.getVoto().getValor()).count();
             long votosAFavor = votoParticipacaos.stream().filter(votoParticipacao -> votoParticipacao.getVoto().getValor()).count();
             ResultadoVotacao resultadoVotacao;
-            if(votosContra > votosAFavor){
+            if (votosContra > votosAFavor) {
                 resultadoVotacao = ResultadoVotacao.P;
-            }else if(votosAFavor > votosContra){
+            } else if (votosAFavor > votosContra) {
                 resultadoVotacao = ResultadoVotacao.V;
-            }else{
+            } else {
                 resultadoVotacao = ResultadoVotacao.E;
             }
             return resultadoVotacao;
@@ -61,8 +65,8 @@ public class VotoParticipacaoServiceImpl implements VotoParticipacaoService {
 
     public void verificarSessaoEncerrada(VotoParticipacaoDTO votoParticipacaoDTO) throws Exception {
         SessaoJulgamento sessaoJulgamento = sessaoJulgamentoService.obterSessaoJulgamentoPorId(votoParticipacaoDTO.getIdJulgamento());
-        LocalDateTime dataHoraAtual= LocalDateTime.now();
-        if( sessaoJulgamento.getDataFim().isBefore(dataHoraAtual) || !sessaoJulgamento.getIndSessaoAberta().getValor()){
+        LocalDateTime dataHoraAtual = LocalDateTime.now();
+        if (sessaoJulgamento.getDataFim().isBefore(dataHoraAtual) || !sessaoJulgamento.getIndSessaoAberta().getValor()) {
             throw new ValidationException("Sessão de julgamento já encerrada.");
         }
     }
@@ -73,6 +77,16 @@ public class VotoParticipacaoServiceImpl implements VotoParticipacaoService {
         if (votoParticipacaoRepository.findByAssociadoAndSessaoJulgamento(associado, sessaoJulgamento).isPresent()) {
             throw new ValidationException("Não é possivel votar duas vezes para mesma sessão.");
         }
+    }
 
+    @Override
+    public Page<VotoParticipacaoDTO> obterVotos(Pageable pageable) {
+        Page<VotoParticipacao> votosParticipaco = votoParticipacaoRepository.findAll(pageable);
+        return prepareDTO(pageable, votosParticipaco);
+    }
+
+    private Page<VotoParticipacaoDTO> prepareDTO(Pageable page, Page<VotoParticipacao> votosParticipacao) {
+        List<VotoParticipacaoDTO> votoParticipacaoDTOS = votosParticipacao.getContent().stream().map(votoParticipacao -> votoParticipacaoMapper.entidadeParaDTO(votoParticipacao)).collect(Collectors.toList());
+        return new PageImpl<>(votoParticipacaoDTOS, page, votosParticipacao.getTotalElements());
     }
 }

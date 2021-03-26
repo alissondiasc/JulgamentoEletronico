@@ -1,5 +1,6 @@
 package br.com.julgamento.web.rest.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +14,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class PautaDTO  implements Serializable {
-
+    @ApiModelProperty(hidden = true)
+    private String id;
     private static final long serialVersionUID = 1L;
     @NotBlank(message = "Campo tema é de preenchimento obrigatório")
     private String tema;

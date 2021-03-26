@@ -15,6 +15,7 @@ public class ResultadoJulgamentoMapper  implements AbstractMapper<ResultadoJulga
     @Override
     public ResultadoJulgamentoDTO entidadeParaDTO(ResultadoJulgamento entidade) {
         return ResultadoJulgamentoDTO.builder()
+                .id(entidade.getId())
                 .idJulgamento(entidade.getSessaoJulgamento().getId())
                 .resultadoVotacao(entidade.getResultadoVotacao().getValor())
                 .build();

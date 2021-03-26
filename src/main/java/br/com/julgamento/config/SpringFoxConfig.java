@@ -6,7 +6,6 @@ import org.springframework.hateoas.client.LinkDiscoverer;
 import org.springframework.hateoas.client.LinkDiscoverers;
 import org.springframework.hateoas.mediatype.collectionjson.CollectionJsonLinkDiscoverer;
 import org.springframework.plugin.core.SimplePluginRegistry;
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -32,22 +31,19 @@ public class SpringFoxConfig implements WebMvcConfigurer {
         List<LinkDiscoverer> plugins = new ArrayList<>();
         plugins.add(new CollectionJsonLinkDiscoverer());
         return new LinkDiscoverers(SimplePluginRegistry.create(plugins));
-
     }
-
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-
         registry.
-                addResourceHandler( "/swagger-ui/**")
+                addResourceHandler("/swagger-ui/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/springfox-swagger-ui/")
                 .resourceChain(false);
     }
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController( "/swagger-ui/")
+        registry.addViewController("/swagger-ui/")
                 .setViewName("forward:" + "/swagger-ui/index.html");
     }
 
@@ -60,7 +56,7 @@ public class SpringFoxConfig implements WebMvcConfigurer {
 
     private ApiInfo apiInfo() {
         return new ApiInfo("Julgamento Eletrônico - API", "API - Descrição", "API", "Terms of service",
-                new Contact("Alisson Dias", "webaddress", "alisson.dias10@live.com"), "License of API", "API license URL",
+                new Contact("Alisson Dias", "https://github.com/alissondiasc/JulgamentoEletronico.git", "alisson.dias10@live.com"), "License of API", "API license URL",
                 Collections.emptyList());
     }
 }

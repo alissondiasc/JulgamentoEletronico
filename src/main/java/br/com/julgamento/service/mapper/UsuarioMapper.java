@@ -12,6 +12,7 @@ public class UsuarioMapper implements AbstractMapper<Usuario, UsuarioDTO> {
     @Override
     public UsuarioDTO entidadeParaDTO(Usuario entidade) {
         return UsuarioDTO.builder()
+                .id(entidade.getId())
                 .nome(entidade.getNome())
                 .CPF(entidade.getCpf())
                 .build();

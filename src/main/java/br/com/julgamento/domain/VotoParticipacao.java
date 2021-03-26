@@ -16,9 +16,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "VOTO_PARTICIPACAO")
-public class VotoParticipacao  implements Serializable {
+public class VotoParticipacao implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 5L;
 
     @Id
     private String id;

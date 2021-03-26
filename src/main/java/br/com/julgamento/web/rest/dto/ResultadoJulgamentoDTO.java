@@ -15,7 +15,7 @@ import javax.validation.constraints.NotBlank;
 @RequiredArgsConstructor
 public class ResultadoJulgamentoDTO {
 
-
+    private String id;
     @NotBlank(message = "Campo idJulgamento é de preenchimento obrigatório.")
     private String  idJulgamento;
     private String resultadoVotacao;

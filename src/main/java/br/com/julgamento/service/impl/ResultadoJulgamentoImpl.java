@@ -2,52 +2,95 @@ package br.com.julgamento.service.impl;
 
 import br.com.julgamento.domain.ResultadoJulgamento;
 import br.com.julgamento.domain.SessaoJulgamento;
+import br.com.julgamento.domain.VotoParticipacao;
 import br.com.julgamento.domain.enums.Indicador;
 import br.com.julgamento.domain.enums.ResultadoVotacao;
+import br.com.julgamento.kafkaService.Producer;
 import br.com.julgamento.repository.ResultadoJulgamentoRepository;
 import br.com.julgamento.repository.SessaoJulgamentoRepository;
+import br.com.julgamento.repository.VotoParticipacaoRepository;
 import br.com.julgamento.service.ResultadoJulgamentoService;
 import br.com.julgamento.service.VotoParticipacaoService;
+import br.com.julgamento.service.mapper.PautaMapper;
 import br.com.julgamento.service.mapper.ResultadoJulgamentoMapper;
+import br.com.julgamento.web.rest.dto.DetalhesResultadoJulgamentoDTO;
 import br.com.julgamento.web.rest.dto.ResultadoJulgamentoDTO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static java.util.Objects.nonNull;
+
+//import org.springframework.kafka
 
 @AllArgsConstructor
 @Service
 @Slf4j
 public class ResultadoJulgamentoImpl implements ResultadoJulgamentoService {
 
+    private final Producer topicProducer;
     private ResultadoJulgamentoRepository resultadoJulgamentoRepository;
     private SessaoJulgamentoRepository sessaoJulgamentoRepository;
+    private VotoParticipacaoRepository votoParticipacaoRepository;
     private VotoParticipacaoService votoParticipacaoService;
     private ResultadoJulgamentoMapper resultadoJulgamentoMapper;
+    private PautaMapper pautaMapper;
 
     @Override
     public ResultadoJulgamentoDTO cadastra(String idJulgamentoSessao) {
         ResultadoVotacao resultadoVotacao = votoParticipacaoService.apurarVotosSessaoJulgamento(idJulgamentoSessao);
-        ResultadoJulgamento  resultadoJulgamento = ResultadoJulgamento.builder().sessaoJulgamento(SessaoJulgamento.builder().id(idJulgamentoSessao).build()).build();
+        ResultadoJulgamento resultadoJulgamento = ResultadoJulgamento.builder().sessaoJulgamento(SessaoJulgamento.builder().id(idJulgamentoSessao).build()).build();
         resultadoJulgamento.setResultadoVotacao(resultadoVotacao);
         resultadoJulgamentoRepository.save(resultadoJulgamento);
         return resultadoJulgamentoMapper.entidadeParaDTO(resultadoJulgamento);
     }
+
     @Override
-    public ResponseEntity<ResultadoJulgamentoDTO> resultadoJulgamentoEletronico(String idSessaoJulgamento) throws Exception {
+    public ResultadoJulgamentoDTO encerrarAndCadastrarResultadoJulg(String idSessaoJulgamento) throws Exception {
         ResultadoJulgamento resultadoJulgamento = resultadoJulgamentoRepository.findBySessaoJulgamento(SessaoJulgamento.builder().id(idSessaoJulgamento).build());
-        if(nonNull(resultadoJulgamento)){
-            return ResponseEntity.ok(resultadoJulgamentoMapper.entidadeParaDTO(resultadoJulgamento));
+        if (nonNull(resultadoJulgamento)) {
+            return resultadoJulgamentoMapper.entidadeParaDTO(resultadoJulgamento);
         }
-        SessaoJulgamento sessaoJulgamento = sessaoJulgamentoRepository.findById(idSessaoJulgamento) .orElseThrow(() -> new Exception("Não existe sessão julgamento com esse id"));
-        ResultadoJulgamentoDTO resultadoJulgamentoDTO =  cadastra(idSessaoJulgamento);
+        SessaoJulgamento sessaoJulgamento = sessaoJulgamentoRepository.findById(idSessaoJulgamento).orElseThrow(() -> new Exception("Não existe sessão julgamento com esse ID: " + idSessaoJulgamento));
+        ResultadoJulgamentoDTO resultadoJulgamentoDTO = cadastra(idSessaoJulgamento);
         sessaoJulgamento.setIndSessaoAberta(Indicador.N);
         sessaoJulgamentoRepository.save(sessaoJulgamento);
-        return ResponseEntity.ok(resultadoJulgamentoDTO);
-        }
+        topicProducer.send(resultadoJulgamentoDTO);
+        return resultadoJulgamentoDTO;
+    }
 
+    @Override
+    public DetalhesResultadoJulgamentoDTO obterDetalhesResultadoJulgamento(String idResultado) throws Exception {
+        ResultadoJulgamento resultadoJulgamento = resultadoJulgamentoRepository.findById(idResultado).orElseThrow(() -> new Exception("Não existe resultado de julgamento com esse ID: " + idResultado));
+        List<VotoParticipacao> votoParticipacaos = votoParticipacaoRepository.findBySessaoJulgamento(SessaoJulgamento.builder().id(resultadoJulgamento.getSessaoJulgamento().getId()).build());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        return DetalhesResultadoJulgamentoDTO.builder()
+                .idJulgamento(resultadoJulgamento.getSessaoJulgamento().getId())
+                .dataJulgamento(resultadoJulgamento.getSessaoJulgamento().getDataInicio().format(formatter))
+                .pautaDTO(pautaMapper.entidadeParaDTO(resultadoJulgamento.getSessaoJulgamento().getPauta()))
+                .resultadojulamento(resultadoJulgamento.getResultadoVotacao().getValor())
+                .votosContras(votoParticipacaos.stream().filter(votoParticipacao -> !votoParticipacao.getVoto().getValor()).count())
+                .votosFavoraveis(votoParticipacaos.stream().filter(votoParticipacao -> votoParticipacao.getVoto().getValor()).count())
+                .build();
+    }
+
+    @Override
+    public Page<ResultadoJulgamentoDTO> obterResultadosJulgamento(Pageable pageable) {
+        Page<ResultadoJulgamento> resultadoJulgamentos = resultadoJulgamentoRepository.findAll(pageable);
+        return prepareDTO(pageable, resultadoJulgamentos);
+    }
+
+    private Page<ResultadoJulgamentoDTO> prepareDTO(Pageable page, Page<ResultadoJulgamento> resultadoJulgamentosPage) {
+        List<ResultadoJulgamentoDTO> usuarioDTOList = resultadoJulgamentosPage.getContent().stream().map(usuario -> resultadoJulgamentoMapper.entidadeParaDTO(usuario)).collect(Collectors.toList());
+        return new PageImpl<>(usuarioDTOList, page, resultadoJulgamentosPage.getTotalElements());
+    }
 
 
 }

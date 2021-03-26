@@ -13,6 +13,7 @@ public class PautaMapper  implements AbstractMapper<Pauta, PautaDTO> {
     @Override
     public PautaDTO entidadeParaDTO(Pauta entidade) {
         return PautaDTO.builder()
+                .id(entidade.getId())
                 .tema(entidade.getTema())
                 .assunto(convertStringToByte(entidade.getAssunto()))
                 .build();

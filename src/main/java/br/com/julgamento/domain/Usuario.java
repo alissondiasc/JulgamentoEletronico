@@ -14,9 +14,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "USUARIO")
-public class Usuario  implements Serializable {
+public class Usuario implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 4L;
 
     @Id
     private String id;
