@@ -1,4 +1,4 @@
-package br.com.julgamento.service.impl;
+package br.com.julgamento.service;
 
 import br.com.julgamento.domain.Pauta;
 import br.com.julgamento.repository.PautaRepository;

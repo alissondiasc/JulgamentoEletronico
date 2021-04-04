@@ -11,5 +11,5 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface UsuarioClient {
 
     @GetMapping(value = "/{cpf}")
-    EntityModel<ResponseClientDTO>  validarCPF(@PathVariable  String cpf);
+    ResponseClientDTO  validarCPF(@PathVariable  String cpf);
 }

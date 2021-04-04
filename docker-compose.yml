@@ -12,3 +12,14 @@ services:
     environment:
       KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+  mongo:
+    image: 'mongo'
+    ports:
+      - 27017:27017
+    container_name: mongo
+    volumes:
+      - /home/sinoed/data/db:/data/db
+
+
+

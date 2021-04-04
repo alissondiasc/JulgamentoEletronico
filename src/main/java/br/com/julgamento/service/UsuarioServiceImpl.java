@@ -1,4 +1,4 @@
-package br.com.julgamento.service.impl;
+package br.com.julgamento.service;
 
 import br.com.julgamento.client.UsuarioClient;
 import br.com.julgamento.domain.Usuario;
@@ -32,8 +32,8 @@ public class UsuarioServiceImpl implements UsuarioSevice {
     public String cadastrar(UsuarioDTO usuarioDTO) {
 
         usuarioDTO.setCPF(usuarioDTO.getCPF().replaceAll("[^0-9]", ""));
-        EntityModel<ResponseClientDTO> responseClientDTO = usuarioClient.validarCPF(usuarioDTO.getCPF());
-        if (responseClientDTO.getContent().isValido()) {
+        ResponseClientDTO responseClientDTO = usuarioClient.validarCPF(usuarioDTO.getCPF());
+        if (responseClientDTO.isValido()) {
             usuarioRepository.save(usuarioMapper.dtoParaEntidade(usuarioDTO));
             return "Usuario criado com sucesso.";
         }
@@ -41,7 +41,7 @@ public class UsuarioServiceImpl implements UsuarioSevice {
     }
 
     @Override
-    public EntityModel<ResponseClientDTO> validarCpf(String cpf) {
+    public ResponseClientDTO validarCpf(String cpf) {
         String novoCpf = cpf.replaceAll("[^0-9]", "");
         if (novoCpf.length() == 11) {
             return usuarioClient.validarCPF(novoCpf);

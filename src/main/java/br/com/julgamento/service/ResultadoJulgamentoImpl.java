@@ -1,4 +1,4 @@
-package br.com.julgamento.service.impl;
+package br.com.julgamento.service;
 
 import br.com.julgamento.domain.ResultadoJulgamento;
 import br.com.julgamento.domain.SessaoJulgamento;

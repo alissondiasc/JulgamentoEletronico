@@ -11,7 +11,7 @@ public interface UsuarioSevice {
 
     String cadastrar(UsuarioDTO usuarioDTO);
 
-    EntityModel<ResponseClientDTO> validarCpf(String cpf);
+    ResponseClientDTO validarCpf(String cpf);
 
     Page<UsuarioDTO> obterUsuario(Pageable pageable);
 }
