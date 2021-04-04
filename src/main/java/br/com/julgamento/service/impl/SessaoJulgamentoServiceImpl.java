@@ -1,4 +1,4 @@
-package br.com.julgamento.service;
+package br.com.julgamento.service.impl;
 
 import br.com.julgamento.domain.SessaoJulgamento;
 import br.com.julgamento.domain.enums.Indicador;
@@ -61,12 +61,6 @@ public class SessaoJulgamentoServiceImpl implements SessaoJulgamentoService {
 
     @Override
     public Page<SessaoJulgamentoDTO> obterSessoesJulgamentos(Pageable pageable) {
-        Page<SessaoJulgamento> pautaPage = sessaoJulgamentoRepository.findAll(pageable);
-        return prepareDTO(pageable, pautaPage);
-    }
-
-    private Page<SessaoJulgamentoDTO> prepareDTO(Pageable page, Page<SessaoJulgamento> sessaoJulgamentoPage) {
-        List<SessaoJulgamentoDTO> usuarioDTOList = sessaoJulgamentoPage.getContent().stream().map(usuario -> sessaoJulgamentoMapper.entidadeParaDTO(usuario)).collect(Collectors.toList());
-        return new PageImpl<>(usuarioDTOList, page, sessaoJulgamentoPage.getTotalElements());
+        return sessaoJulgamentoMapper.pageEntidadeParaPageDTO(sessaoJulgamentoRepository.findAll(pageable));
     }
 }

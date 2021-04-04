@@ -1,4 +1,4 @@
-package br.com.julgamento.service;
+package br.com.julgamento.service.impl;
 
 import br.com.julgamento.domain.Pauta;
 import br.com.julgamento.repository.PautaRepository;
@@ -31,12 +31,6 @@ public class PautaServiceImpl implements PautaService {
 
     @Override
     public Page<PautaDTO> obterPautas(Pageable pageable) {
-        Page<Pauta> pautaPage = pautaRepository.findAll(pageable);
-        return prepareDTO(pageable, pautaPage);
-    }
-
-    private Page<PautaDTO> prepareDTO(Pageable page, Page<Pauta> pautaPage) {
-        List<PautaDTO> usuarioDTOList = pautaPage.getContent().stream().map(usuario -> pautaMapper.entidadeParaDTO(usuario)).collect(Collectors.toList());
-        return new PageImpl<>(usuarioDTOList, page, pautaPage.getTotalElements());
+        return pautaMapper.pageEntidadeParaPageDTO(pautaRepository.findAll(pageable));
     }
 }

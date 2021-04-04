@@ -1,4 +1,4 @@
-package br.com.julgamento.service;
+package br.com.julgamento.service.impl;
 
 import br.com.julgamento.domain.SessaoJulgamento;
 import br.com.julgamento.domain.Usuario;
@@ -81,12 +81,6 @@ public class VotoParticipacaoServiceImpl implements VotoParticipacaoService {
 
     @Override
     public Page<VotoParticipacaoDTO> obterVotos(Pageable pageable) {
-        Page<VotoParticipacao> votosParticipaco = votoParticipacaoRepository.findAll(pageable);
-        return prepareDTO(pageable, votosParticipaco);
-    }
-
-    private Page<VotoParticipacaoDTO> prepareDTO(Pageable page, Page<VotoParticipacao> votosParticipacao) {
-        List<VotoParticipacaoDTO> votoParticipacaoDTOS = votosParticipacao.getContent().stream().map(votoParticipacao -> votoParticipacaoMapper.entidadeParaDTO(votoParticipacao)).collect(Collectors.toList());
-        return new PageImpl<>(votoParticipacaoDTOS, page, votosParticipacao.getTotalElements());
+        return votoParticipacaoMapper.pageEntidadeParaPageDTO(votoParticipacaoRepository.findAll(pageable));
     }
 }

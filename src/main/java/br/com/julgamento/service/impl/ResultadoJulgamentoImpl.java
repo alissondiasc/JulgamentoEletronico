@@ -1,4 +1,4 @@
-package br.com.julgamento.service;
+package br.com.julgamento.service.impl;
 
 import br.com.julgamento.domain.ResultadoJulgamento;
 import br.com.julgamento.domain.SessaoJulgamento;
@@ -83,14 +83,6 @@ public class ResultadoJulgamentoImpl implements ResultadoJulgamentoService {
 
     @Override
     public Page<ResultadoJulgamentoDTO> obterResultadosJulgamento(Pageable pageable) {
-        Page<ResultadoJulgamento> resultadoJulgamentos = resultadoJulgamentoRepository.findAll(pageable);
-        return prepareDTO(pageable, resultadoJulgamentos);
+        return resultadoJulgamentoMapper.pageEntidadeParaPageDTO(resultadoJulgamentoRepository.findAll(pageable));
     }
-
-    private Page<ResultadoJulgamentoDTO> prepareDTO(Pageable page, Page<ResultadoJulgamento> resultadoJulgamentosPage) {
-        List<ResultadoJulgamentoDTO> usuarioDTOList = resultadoJulgamentosPage.getContent().stream().map(usuario -> resultadoJulgamentoMapper.entidadeParaDTO(usuario)).collect(Collectors.toList());
-        return new PageImpl<>(usuarioDTOList, page, resultadoJulgamentosPage.getTotalElements());
-    }
-
-
 }

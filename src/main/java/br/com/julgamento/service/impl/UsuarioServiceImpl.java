@@ -1,4 +1,4 @@
-package br.com.julgamento.service;
+package br.com.julgamento.service.impl;
 
 import br.com.julgamento.client.UsuarioClient;
 import br.com.julgamento.domain.Usuario;
@@ -52,12 +52,6 @@ public class UsuarioServiceImpl implements UsuarioSevice {
 
     @Override
     public Page<UsuarioDTO> obterUsuario(Pageable pageable) {
-        Page<Usuario> usuariosPage = usuarioRepository.findAll(pageable);
-        return prepareDTO(pageable, usuariosPage);
-    }
-
-    private Page<UsuarioDTO> prepareDTO(Pageable page, Page<Usuario> usuariosPage) {
-        List<UsuarioDTO> usuarioDTOList = usuariosPage.getContent().stream().map(usuario -> usuarioMapper.entidadeParaDTO(usuario)).collect(Collectors.toList());
-        return new PageImpl<>(usuarioDTOList, page, usuariosPage.getTotalElements());
+        return usuarioMapper.pageEntidadeParaPageDTO(usuarioRepository.findAll(pageable));
     }
 }

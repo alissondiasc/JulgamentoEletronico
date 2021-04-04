@@ -1,7 +1,12 @@
 package br.com.julgamento.service.mapper;
 
 
+import br.com.julgamento.domain.Pauta;
+import br.com.julgamento.domain.Usuario;
+import br.com.julgamento.web.rest.dto.PautaDTO;
+import br.com.julgamento.web.rest.dto.UsuarioDTO;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Objects;
@@ -30,5 +35,7 @@ interface AbstractMapper<CLASSE, DTO> {
     default Page<DTO> pageEntidadeParaPageDTO(Page<CLASSE> entidade) {
         return entidade.map(this::entidadeParaDTO);
     }
+
+
 }
 

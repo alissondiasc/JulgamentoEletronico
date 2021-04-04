@@ -2,6 +2,7 @@ package br.com.julgamento.service;
 
 import br.com.julgamento.client.UsuarioClient;
 import br.com.julgamento.repository.UsuarioRepository;
+import br.com.julgamento.service.impl.UsuarioServiceImpl;
 import br.com.julgamento.service.mapper.UsuarioMapper;
 import br.com.julgamento.web.rest.dto.ResponseClientDTO;
 import br.com.julgamento.web.rest.dto.UsuarioDTO;
@@ -68,5 +69,8 @@ public class UsuarioServiceImplTest {
         assertThat(retorno).isNotNull();
         assertEquals(retorno, "Usuario criado com sucesso.");
     }
+
+
+
 
 }
