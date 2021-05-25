@@ -26,9 +26,9 @@ O Lombok é uma biblioteca Java focada em produtividade e redução de código b
 
 #  Construção e inicialização do projeto.
 
-- mvn instal: para download das dependencias no repositório maven.
+- mvn install: para download das dependencias no repositório maven.
 
-- docker compose up: (na raiz do projeto) para rodar os containers do kafka.
+- docker compose up: (na raiz do projeto) para rodar os containers docker.
 
 - mvnw spring-boot:run: para startar o servidor da aplicação.
 
